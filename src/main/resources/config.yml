@@ -1,0 +1,21 @@
+# Messages
+prefix: '&eBank &8>&r '
+warning-prefix: '&cBank &8>&r '
+
+# MySql connection data
+mysql-host: 'localhost'
+mysql-port: 3306
+mysql-user: 'user'
+mysql-password: 'password'
+mysql-database: 'rsb'
+
+# Bonus
+feed-animal: 20
+kill-monster: 20
+
+# Punish
+kill-animal: 20
+eat-flesh: 20
+
+# Interest per 5 minutes
+interest: 3.0

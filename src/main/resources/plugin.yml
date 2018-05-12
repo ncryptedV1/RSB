@@ -1,0 +1,10 @@
+name: RSB
+author: ncrypted
+version: 1.0.0
+main: de.ncrypted.rsb.RSB
+
+commands:
+  cash:
+    description: Zeigt dein Bargeld
+    usage: </cash>
+    permission: rsb.cash
