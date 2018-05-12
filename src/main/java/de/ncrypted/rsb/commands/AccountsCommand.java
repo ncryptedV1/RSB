@@ -6,22 +6,26 @@
 package de.ncrypted.rsb.commands;
 
 import de.ncrypted.rsb.utils.PlayerNotCachedException;
+import de.ncrypted.rsb.utils.Utils;
 import org.bukkit.entity.Player;
 
 /**
  * @author ncrypted
  */
-public class CashCommand extends AbstractCommand {
+public class AccountsCommand extends AbstractCommand {
 
     @Override
     public void onPlayer(Player player, String[] args) {
-        if (!player.hasPermission("rsb.cash")) {
+        if (!hasPerm("rsb.accounts")) {
             sendNoPerms();
             return;
         }
+        sendMsg("§6Konten:");
         try {
-            long money = getApi().getCash(player);
-            sendMsg("§6Bargeld: §e" + money + "$");
+            for (int id : getApi().getAccounts(player)) {
+                sendMsg("§8- §e" + Utils.toUserId(id));
+            }
+            sendMsg("");
         } catch (PlayerNotCachedException e) {
             sendWarn("§cDeine Daten werden noch geladen...\nBitte warte einen Moment");
         }

@@ -5,7 +5,7 @@
 
 package de.ncrypted.rsb;
 
-import de.ncrypted.rsb.commands.CashCommand;
+import de.ncrypted.rsb.commands.*;
 import de.ncrypted.rsb.config.ConfigController;
 import de.ncrypted.rsb.config.ConfigHandler;
 import de.ncrypted.rsb.database.CacheController;
@@ -64,6 +64,12 @@ public class RSB extends JavaPlugin {
         api = new RSBApi(this);
 
         getCommand("cash").setExecutor(new CashCommand());
+        getCommand("account").setExecutor(new AccountCommand());
+        getCommand("accounts").setExecutor(new AccountsCommand());
+        getCommand("deposit").setExecutor(new DepositCommand());
+        getCommand("withdraw").setExecutor(new WithdrawCommand());
+        getCommand("pay").setExecutor(new PayCommand());
+        getCommand("transfer").setExecutor(new TransferCommand());
         Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
     }
 

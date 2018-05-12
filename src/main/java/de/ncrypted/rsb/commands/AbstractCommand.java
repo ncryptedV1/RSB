@@ -63,8 +63,16 @@ public class AbstractCommand implements CommandExecutor {
         sender.sendMessage(RSB.getPrefix() + msg);
     }
 
+    public void sendMsg(Player player, String msg) {
+        player.sendMessage(RSB.getPrefix() + msg);
+    }
+
     public void sendWarn(String msg) {
         sender.sendMessage(RSB.getWarning() + msg);
+    }
+
+    public void sendWarn(Player player, String msg) {
+        player.sendMessage(RSB.getWarning() + msg);
     }
 
     public void setFood(int food) {

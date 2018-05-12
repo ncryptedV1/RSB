@@ -7,4 +7,41 @@ commands:
   cash:
     description: Zeigt dein Bargeld
     usage: </cash>
-    permission: rsb.cash
+  account:
+    description: Konten-Verwaltung
+    usage: </account <id>/create/delete>
+  accounts:
+    description: Listet Konten auf
+    usage: </accounts>
+  deposit:
+    description: Zahlt einen Betrag ins Konto ein
+    usage: </deposit <account> <cash>>
+  withdraw:
+    description: Zahlt einen Betrag aus
+    usage: </withdraw <account> <cash>>
+  pay:
+    description: Verschickt Bargeld zu einem Online-Spieler
+    usage: </pay <player> <cash>>
+  transfer:
+    description: Ueberweisen von Geld zwischen Konten
+    usage: </transfer <source> <target> <amount>>
+
+permissions:
+  rsb.cash:
+    description: Bargeld anzeigen
+  rsb.account.balance:
+    description: Kontostand anzeigen
+  rsb.account.create:
+    description: Konto erstellen
+  rsb.account.delete:
+    description: Konto löschen
+  rsb.accounts:
+    description: Konten auflisten
+  rsb.deposit:
+    description: Einzahlung
+  rsb.withdraw:
+    description: Auszahlung
+  rsb.pay:
+    description: Bargeld versenden
+  rsb.transfer:
+    description: Überweisung

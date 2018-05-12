@@ -37,6 +37,15 @@ public class MySqlController {
         connect();
     }
 
+    public void createTables() {
+        CustomStatement cs = new CustomStatement(getConnection(),
+                "CREATE TABLE IF NOT EXISTS cash(uuid VARCHAR(36) PRIMARY KEY NOT NULL, money BIGINT)");
+        cs.execUpd();
+        cs = new CustomStatement(getConnection(),
+                "CREATE TABLE IF NOT EXISTS accounts(id INT(6) PRIMARY KEY AUTO_INCREMENT, uuid VARCHAR(36), balance BIGINT)");
+        cs.execUpd();
+    }
+
     public void connect() {
         if (isConnected()) {
             return;
@@ -64,7 +73,7 @@ public class MySqlController {
         config.setMaximumPoolSize(5);
         config.setMinimumIdle(2);
         dataSource = new HikariDataSource(config);
-        rsb.getMySqlInterface().createTables();
+        createTables();
     }
 
     public void disconnect() {
@@ -78,9 +87,13 @@ public class MySqlController {
         return dataSource != null && !dataSource.isClosed();
     }
 
-    public Connection getConnection() throws SQLException {
-        if (isConnected())
-            return dataSource.getConnection();
+    public Connection getConnection() {
+        if (isConnected()) {
+            try {
+                return dataSource.getConnection();
+            } catch (SQLException e) {
+            }
+        }
         return null;
     }
 }

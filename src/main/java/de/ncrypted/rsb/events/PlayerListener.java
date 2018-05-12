@@ -7,6 +7,7 @@ package de.ncrypted.rsb.events;
 
 import com.google.common.collect.HashMultimap;
 import de.ncrypted.rsb.RSB;
+import de.ncrypted.rsb.utils.PlayerNotCachedException;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -16,6 +17,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * @author ncrypted
@@ -53,6 +55,12 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        rsb.getCacheController().clearCache(player);
+    }
+
+    @EventHandler
     public void onKill(EntityDeathEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof Animals) {
@@ -62,7 +70,10 @@ public class PlayerListener implements Listener {
                 return;
             }
             int punish = rsb.getConfigHandler().getNumber("kill-animal");
-            RSB.getApi().removeCash(killer, punish);
+            try {
+                RSB.getApi().removeCash(killer, punish);
+            } catch (PlayerNotCachedException e) {
+            }
             killer.sendMessage(RSB.getWarning() + "§cDu hast ein Tier getötet");
             killer.sendMessage(RSB.getWarning() + "§cAls Strafe wurden dir §o" + punish + "$ §cabgezogen");
         } else if (entity instanceof Monster) {
@@ -72,7 +83,10 @@ public class PlayerListener implements Listener {
                 return;
             }
             int bonus = rsb.getConfigHandler().getNumber("kill-monster");
-            RSB.getApi().addCash(killer, bonus);
+            try {
+                RSB.getApi().addCash(killer, bonus);
+            } catch (PlayerNotCachedException e) {
+            }
             killer.sendMessage(RSB.getPrefix() + "§6Du hast ein Monster getötet");
             killer.sendMessage(RSB.getPrefix() + "§6Als Bonus wurden dir §o" + bonus + "$ §6geschenkt");
         }
@@ -84,7 +98,10 @@ public class PlayerListener implements Listener {
         Material mat = event.getItem().getType();
         if (isFlesh(mat)) {
             int punish = rsb.getConfigHandler().getNumber("eat-flesh");
-            RSB.getApi().removeCash(player, punish);
+            try {
+                RSB.getApi().removeCash(player, punish);
+            } catch (PlayerNotCachedException e) {
+            }
             player.sendMessage(RSB.getWarning() + "§cDu hast Fliesch gegessen");
             player.sendMessage(RSB.getWarning() + "§cAls Strafe wurden dir §o" + punish + "$ §cabgezogen");
         }
@@ -112,7 +129,10 @@ public class PlayerListener implements Listener {
                 }
                 if (fed) {
                     int bonus = rsb.getConfigHandler().getNumber("feed-animal");
-                    RSB.getApi().addCash(player, bonus);
+                    try {
+                        RSB.getApi().addCash(player, bonus);
+                    } catch (PlayerNotCachedException e) {
+                    }
                     player.sendMessage(RSB.getPrefix() + "§6Du hast ein Tier gefüttert");
                     player.sendMessage(RSB.getPrefix() + "§6Als Bonus wurden dir §o" + bonus + "$ §6geschenkt");
                 }
