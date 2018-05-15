@@ -32,7 +32,9 @@ public class PlayerListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         rsb.getMySqlInterface().setupPlayer(player);
-        rsb.getCacheController().loadCache(player);
+        rsb.getCacheController().loadCache(player, () -> {
+            rsb.getSideboardController().update(player);
+        });
     }
 
     @EventHandler
@@ -45,7 +47,7 @@ public class PlayerListener implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         Action action = event.getAction();
-        if (action != Action.LEFT_CLICK_BLOCK) {
+        if (action != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
         if (event.getClickedBlock().getType() != Material.GOLD_BLOCK) {

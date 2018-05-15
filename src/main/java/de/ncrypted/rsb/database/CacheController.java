@@ -34,7 +34,8 @@ public class CacheController {
         mysql = rsb.getMySqlInterface();
     }
 
-    public void loadCache(Player player) {
+    public void loadCache(Player player, Runnable onFinish) {
+        CachingWaiter waiter = new CachingWaiter(onFinish);
         UUID uuid = player.getUniqueId();
         if (cash.containsKey(uuid)) {
             return;
@@ -49,9 +50,11 @@ public class CacheController {
                 accountToUuid.put(id, uuid);
                 mysql.getBalance(id, balance -> {
                     balances.put(id, balance);
+                    waiter.gotBalances();
                 });
                 mysql.getTransfers(id, transfer -> {
                     transfers.put(id, transfer);
+                    waiter.gotTransfers();
                 });
             }
         });
@@ -89,5 +92,31 @@ public class CacheController {
 
     public Map<Integer, List<Transaction>> getTransfers() {
         return transfers;
+    }
+
+    private class CachingWaiter {
+        private boolean balances = false;
+        private boolean transfers = false;
+        private Runnable runnable;
+
+        public CachingWaiter(Runnable runnable) {
+            this.runnable = runnable;
+        }
+
+        public void gotBalances() {
+            balances = true;
+            check();
+        }
+
+        public void gotTransfers() {
+            transfers = true;
+            check();
+        }
+
+        private void check() {
+            if (balances && transfers) {
+                runnable.run();
+            }
+        }
     }
 }

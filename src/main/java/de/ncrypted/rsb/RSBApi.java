@@ -9,8 +9,10 @@ import de.ncrypted.rsb.database.CacheController;
 import de.ncrypted.rsb.database.MySqlInterface;
 import de.ncrypted.rsb.exceptions.PlayerNotCachedException;
 import de.ncrypted.rsb.utils.Transaction;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -69,6 +71,7 @@ public class RSBApi {
         }
         if (isPlayerLoaded(uuid)) {
             cache.getCash().put(uuid, money);
+            updateSideboard(Bukkit.getPlayer(uuid));
         }
         mysql.setCash(uuid, money);
     }
@@ -108,6 +111,8 @@ public class RSBApi {
                 cache.getAccounts().get(uuid).add(id);
                 cache.getAccountToUuid().put(id, uuid);
                 cache.getBalances().put(id, 0L);
+                cache.getTransfers().put(id, new ArrayList<>());
+                updateSideboard(player);
             }
             consumer.accept(id);
         });
@@ -120,9 +125,11 @@ public class RSBApi {
      */
     public void deleteAccount(int id) {
         if (cache.getAccountToUuid().containsKey(id)) {
+            updateSideboard(Bukkit.getPlayer(cache.getAccountToUuid().get(id)));
             cache.getAccounts().get(cache.getAccountToUuid().get(id)).remove(id);
             cache.getAccountToUuid().remove(id);
             cache.getBalances().remove(id);
+            cache.getTransfers().remove(id);
         }
         mysql.deleteAccount(id);
     }
@@ -200,6 +207,7 @@ public class RSBApi {
         }
         if (cache.getBalances().get(id) != null) {
             cache.getBalances().put(id, balance);
+            updateSideboard(Bukkit.getPlayer(cache.getAccountToUuid().get(id)));
         }
         mysql.setBalance(id, balance);
     }
@@ -300,6 +308,10 @@ public class RSBApi {
         removeBalance(sourcePlayer, source, money);
         setBalance(target, targetBalance + money);
         addTransfer(new Transaction(source, target, money));
+        updateSideboard(sourcePlayer);
+        if (cache.getAccountToUuid().containsKey(target)) {
+            updateSideboard(Bukkit.getPlayer(cache.getAccountToUuid().get(target)));
+        }
     }
 
     /**
@@ -315,6 +327,7 @@ public class RSBApi {
         removeCash(player, money);
         addBalance(player, id, money);
         addTransfer(new Transaction(0, id, money));
+        updateSideboard(player);
     }
 
     /**
@@ -329,6 +342,7 @@ public class RSBApi {
         removeBalance(player, id, money);
         addCash(player, money);
         addTransfer(new Transaction(id, 0, money));
+        updateSideboard(player);
     }
 
     // UTILS
@@ -344,8 +358,19 @@ public class RSBApi {
      */
     public boolean isPlayerLoaded(UUID uuid) {
         if (cache.getCash().containsKey(uuid) && cache.getAccounts().containsKey(uuid)) {
+            Set<Integer> accounts = cache.getAccounts().get(uuid);
+            for (int id : accounts) {
+                if (!cache.getAccountToUuid().containsKey(id) || !cache.getTransfers().containsKey(id) ||
+                        !cache.getBalances().containsKey(id)) {
+                    return false;
+                }
+            }
             return true;
         }
         return false;
+    }
+
+    private void updateSideboard(Player player) {
+        rsb.getSideboardController().update(player);
     }
 }

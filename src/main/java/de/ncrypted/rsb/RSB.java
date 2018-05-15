@@ -14,6 +14,7 @@ import de.ncrypted.rsb.database.MySqlInterface;
 import de.ncrypted.rsb.events.PlayerBonusListener;
 import de.ncrypted.rsb.events.PlayerListener;
 import de.ncrypted.rsb.utils.InterestTask;
+import de.ncrypted.rsb.utils.SideboardController;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -30,6 +31,7 @@ public class RSB extends JavaPlugin {
     private MySqlController mySqlController;
     private MySqlInterface mySqlInterface;
     private CacheController cacheController;
+    private SideboardController sideboardController;
     private BukkitTask interestTask;
 
     public static RSBApi getApi() {
@@ -64,6 +66,7 @@ public class RSB extends JavaPlugin {
         }
         mySqlInterface = new MySqlInterface(this);
         cacheController = new CacheController(this);
+        sideboardController = new SideboardController(this);
         api = new RSBApi(this);
 
         getCommand("cash").setExecutor(new CashCommand());
@@ -76,7 +79,7 @@ public class RSB extends JavaPlugin {
         getCommand("transfers").setExecutor(new TransfersCommand());
         Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerBonusListener(this), this);
-        interestTask = new InterestTask(this).runTaskTimerAsynchronously(this, 200, 200);
+        interestTask = new InterestTask(this).runTaskTimerAsynchronously(this, 6000, 6000);
     }
 
     @Override
@@ -102,5 +105,9 @@ public class RSB extends JavaPlugin {
 
     public CacheController getCacheController() {
         return cacheController;
+    }
+
+    public SideboardController getSideboardController() {
+        return sideboardController;
     }
 }
