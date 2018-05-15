@@ -5,7 +5,7 @@
 
 package de.ncrypted.rsb.commands;
 
-import de.ncrypted.rsb.utils.PlayerNotCachedException;
+import de.ncrypted.rsb.exceptions.PlayerNotCachedException;
 import de.ncrypted.rsb.utils.Transaction;
 import de.ncrypted.rsb.utils.Utils;
 import org.bukkit.entity.Player;
@@ -36,7 +36,8 @@ public class TransfersCommand extends AbstractCommand {
                 sendWarn("§cDu bist nicht der Besitzer des Kontos §o" + Utils.toUserId(id));
                 return;
             }
-            List<Transaction> transfers = getApi().getTransfers(player, id);
+            List<Transaction> allTransfers = getApi().getTransfers(player, id);
+            List<Transaction> transfers = allTransfers.subList(0, allTransfers.size() > 10 ? 10 : allTransfers.size());
             if (transfers.isEmpty()) {
                 sendWarn("§cEs existieren bisher noch keine Interaktionen mit dem Konto §4" + Utils.toUserId(id));
                 return;

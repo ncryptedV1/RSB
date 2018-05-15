@@ -5,41 +5,22 @@
 
 package de.ncrypted.rsb.events;
 
-import com.google.common.collect.HashMultimap;
 import de.ncrypted.rsb.RSB;
-import de.ncrypted.rsb.utils.PlayerNotCachedException;
-import org.bukkit.Bukkit;
+import de.ncrypted.rsb.utils.InventoryFactory;
 import org.bukkit.Material;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 
 /**
  * @author ncrypted
  */
 public class PlayerListener implements Listener {
-
-    private static HashMultimap<Object, Object> animalFood = HashMultimap.create();
-
-    static {
-        animalFood.put(EntityType.COW, Material.WHEAT);
-        animalFood.put(EntityType.SHEEP, Material.WHEAT);
-        animalFood.put(EntityType.CHICKEN, Material.SEEDS);
-        animalFood.put(EntityType.PIG, Material.CARROT);
-        animalFood.put(EntityType.HORSE, Material.WHEAT);
-        animalFood.put(EntityType.HORSE, Material.SUGAR);
-        animalFood.put(EntityType.HORSE, Material.HAY_BLOCK);
-        animalFood.put(EntityType.HORSE, Material.APPLE);
-        animalFood.put(EntityType.HORSE, Material.GOLDEN_CARROT);
-        animalFood.put(EntityType.HORSE, Material.GOLDEN_APPLE);
-        animalFood.put(EntityType.WOLF, Material.BONE);
-        animalFood.put(EntityType.OCELOT, Material.RAW_FISH);
-    }
 
     private RSB rsb;
 
@@ -61,100 +42,18 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onKill(EntityDeathEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof Animals) {
-            Animals animal = (Animals) entity;
-            Player killer = animal.getKiller();
-            if (killer == null) {
-                return;
-            }
-            int punish = rsb.getConfigHandler().getNumber("kill-animal");
-            try {
-                RSB.getApi().removeCash(killer, punish);
-            } catch (PlayerNotCachedException e) {
-            }
-            killer.sendMessage(RSB.getWarning() + "§cDu hast ein Tier getötet");
-            killer.sendMessage(RSB.getWarning() + "§cAls Strafe wurden dir §o" + punish + "$ §cabgezogen");
-        } else if (entity instanceof Monster) {
-            Monster monster = (Monster) entity;
-            Player killer = monster.getKiller();
-            if (killer == null) {
-                return;
-            }
-            int bonus = rsb.getConfigHandler().getNumber("kill-monster");
-            try {
-                RSB.getApi().addCash(killer, bonus);
-            } catch (PlayerNotCachedException e) {
-            }
-            killer.sendMessage(RSB.getPrefix() + "§6Du hast ein Monster getötet");
-            killer.sendMessage(RSB.getPrefix() + "§6Als Bonus wurden dir §o" + bonus + "$ §6geschenkt");
-        }
-    }
-
-    @EventHandler
-    public void onEat(PlayerItemConsumeEvent event) {
+    public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        Material mat = event.getItem().getType();
-        if (isFlesh(mat)) {
-            int punish = rsb.getConfigHandler().getNumber("eat-flesh");
-            try {
-                RSB.getApi().removeCash(player, punish);
-            } catch (PlayerNotCachedException e) {
-            }
-            player.sendMessage(RSB.getWarning() + "§cDu hast Fliesch gegessen");
-            player.sendMessage(RSB.getWarning() + "§cAls Strafe wurden dir §o" + punish + "$ §cabgezogen");
-        }
-    }
-
-    @EventHandler
-    public void onFeed(PlayerInteractAtEntityEvent event) {
-        Player player = event.getPlayer();
-        int countBefore = player.getItemInHand().getAmount();
-        EntityType entityType = event.getRightClicked().getType();
-        if (player.getItemInHand() == null) {
+        Action action = event.getAction();
+        if (action != Action.LEFT_CLICK_BLOCK) {
             return;
         }
-        Material mat = player.getItemInHand().getType();
-
-        if (isFeedable(entityType, mat)) {
-            Bukkit.getScheduler().runTaskLaterAsynchronously(rsb, () -> {
-                boolean fed = false;
-                if (player.getItemInHand() == null && countBefore == 1) {
-                    fed = true;
-                }
-                int count = player.getItemInHand().getAmount();
-                if (countBefore > 1 && count == countBefore - 1) {
-                    fed = true;
-                }
-                if (fed) {
-                    int bonus = rsb.getConfigHandler().getNumber("feed-animal");
-                    try {
-                        RSB.getApi().addCash(player, bonus);
-                    } catch (PlayerNotCachedException e) {
-                    }
-                    player.sendMessage(RSB.getPrefix() + "§6Du hast ein Tier gefüttert");
-                    player.sendMessage(RSB.getPrefix() + "§6Als Bonus wurden dir §o" + bonus + "$ §6geschenkt");
-                }
-            }, 1);
+        if (event.getClickedBlock().getType() != Material.GOLD_BLOCK) {
+            return;
         }
-    }
-
-    private boolean isFlesh(Material mat) {
-        if (mat == Material.ROTTEN_FLESH || mat == Material.COOKED_BEEF || mat == Material.RAW_BEEF ||
-                mat == Material.PORK || mat == Material.GRILLED_PORK || mat == Material.MUTTON ||
-                mat == Material.COOKED_MUTTON) {
-            return true;
+        Inventory toOpen = InventoryFactory.getGoldBlock(player);
+        if (toOpen != null) {
+            player.openInventory(toOpen);
         }
-        return false;
-    }
-
-    private boolean isFeedable(EntityType entityType, Material mat) {
-        for (Object food : animalFood.get(entityType)) {
-            if (mat == food) {
-                return true;
-            }
-        }
-        return false;
     }
 }

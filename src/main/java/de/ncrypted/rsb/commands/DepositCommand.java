@@ -5,7 +5,7 @@
 
 package de.ncrypted.rsb.commands;
 
-import de.ncrypted.rsb.utils.PlayerNotCachedException;
+import de.ncrypted.rsb.exceptions.PlayerNotCachedException;
 import de.ncrypted.rsb.utils.Utils;
 import org.bukkit.entity.Player;
 

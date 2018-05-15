@@ -7,7 +7,7 @@ package de.ncrypted.rsb;
 
 import de.ncrypted.rsb.database.CacheController;
 import de.ncrypted.rsb.database.MySqlInterface;
-import de.ncrypted.rsb.utils.PlayerNotCachedException;
+import de.ncrypted.rsb.exceptions.PlayerNotCachedException;
 import de.ncrypted.rsb.utils.Transaction;
 import org.bukkit.entity.Player;
 
@@ -256,16 +256,10 @@ public class RSBApi {
         int target = transaction.getTarget();
         if (cache.getTransfers().containsKey(sender)) {
             List<Transaction> transfers = cache.getTransfers().get(sender);
-            if (transfers.size() == 10) {
-                transfers.remove(transfers.size() - 1);
-            }
             transfers.add(0, transaction);
         }
         if (cache.getTransfers().containsKey(target)) {
             List<Transaction> transfers = cache.getTransfers().get(target);
-            if (transfers.size() == 10) {
-                transfers.remove(transfers.size() - 1);
-            }
             transfers.add(0, transaction);
         }
         mysql.addTransfer(transaction);

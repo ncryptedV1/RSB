@@ -3,7 +3,7 @@
  * All rights reserved
  */
 
-package de.ncrypted.rsb.utils;
+package de.ncrypted.rsb.exceptions;
 
 /**
  * @author ncrypted

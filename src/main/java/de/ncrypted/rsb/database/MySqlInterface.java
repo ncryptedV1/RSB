@@ -150,7 +150,7 @@ public class MySqlInterface {
         pool.execute(() -> {
             List<Transaction> result = new ArrayList<>();
             CustomStatement cs = new CustomStatement(getConn(),
-                    "SELECT * FROM transfers WHERE sender = ? OR target = ? ORDER BY date_recorded DESC LIMIT 10")
+                    "SELECT * FROM transfers WHERE sender = ? OR target = ? ORDER BY date_recorded DESC")
                     .setInt(1, id)
                     .setInt(2, id);
             CustomResultSet crs = cs.execQuery();

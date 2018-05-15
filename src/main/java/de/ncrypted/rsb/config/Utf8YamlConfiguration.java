@@ -3,7 +3,7 @@
  * All rights reserved
  */
 
-package de.ncrypted.rsb.utils;
+package de.ncrypted.rsb.config;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

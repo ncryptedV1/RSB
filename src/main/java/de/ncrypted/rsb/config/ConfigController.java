@@ -7,7 +7,6 @@ package de.ncrypted.rsb.config;
 
 import de.ncrypted.rsb.RSB;
 import de.ncrypted.rsb.utils.Logger;
-import de.ncrypted.rsb.utils.Utf8YamlConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;

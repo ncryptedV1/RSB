@@ -11,23 +11,26 @@ import de.ncrypted.rsb.config.ConfigHandler;
 import de.ncrypted.rsb.database.CacheController;
 import de.ncrypted.rsb.database.MySqlController;
 import de.ncrypted.rsb.database.MySqlInterface;
+import de.ncrypted.rsb.events.PlayerBonusListener;
 import de.ncrypted.rsb.events.PlayerListener;
+import de.ncrypted.rsb.utils.InterestTask;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 /**
  * @author ncrypted
  */
 public class RSB extends JavaPlugin {
 
-    private static ConfigController configController;
     private static ConfigHandler configHandler;
-    private static MySqlController mySqlController;
-    private static MySqlInterface mySqlInterface;
-    private static CacheController cacheController;
     private static RSBApi api;
-
     private static boolean stopStartup = false;
+    private ConfigController configController;
+    private MySqlController mySqlController;
+    private MySqlInterface mySqlInterface;
+    private CacheController cacheController;
+    private BukkitTask interestTask;
 
     public static RSBApi getApi() {
         return api;
@@ -72,6 +75,8 @@ public class RSB extends JavaPlugin {
         getCommand("transfer").setExecutor(new TransferCommand());
         getCommand("transfers").setExecutor(new TransfersCommand());
         Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerBonusListener(this), this);
+        interestTask = new InterestTask(this).runTaskTimerAsynchronously(this, 200, 200);
     }
 
     @Override
