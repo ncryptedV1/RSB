@@ -38,12 +38,14 @@ public class MySqlController {
     }
 
     public void createTables() {
-        CustomStatement cs = new CustomStatement(getConnection(),
-                "CREATE TABLE IF NOT EXISTS cash(uuid VARCHAR(36) PRIMARY KEY NOT NULL, money BIGINT)");
-        cs.execUpd();
-        cs = new CustomStatement(getConnection(),
-                "CREATE TABLE IF NOT EXISTS accounts(id INT(6) PRIMARY KEY AUTO_INCREMENT, uuid VARCHAR(36), balance BIGINT)");
-        cs.execUpd();
+        new CustomStatement(getConnection(),
+                "CREATE TABLE IF NOT EXISTS cash(uuid VARCHAR(36) PRIMARY KEY NOT NULL, money BIGINT)").execUpd();
+        new CustomStatement(getConnection(),
+                "CREATE TABLE IF NOT EXISTS accounts(id INT(6) PRIMARY KEY AUTO_INCREMENT, uuid VARCHAR(36), balance BIGINT)")
+                .execUpd();
+        new CustomStatement(getConnection(),
+                "CREATE TABLE IF NOT EXISTS transfers(date_recorded TIMESTAMP, sender INT(6), target INT(6), money BIGINT)")
+                .execUpd();
     }
 
     public void connect() {

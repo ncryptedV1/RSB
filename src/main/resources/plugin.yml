@@ -25,6 +25,9 @@ commands:
   transfer:
     description: Ueberweisen von Geld zwischen Konten
     usage: </transfer <source> <target> <amount>>
+  transfers:
+    description: Listet die letzten 10 Transaktionen auf
+    usage: </transfers <account>>
 
 permissions:
   rsb.cash:
@@ -34,7 +37,7 @@ permissions:
   rsb.account.create:
     description: Konto erstellen
   rsb.account.delete:
-    description: Konto löschen
+    description: Konto loeschen
   rsb.accounts:
     description: Konten auflisten
   rsb.deposit:
@@ -44,4 +47,6 @@ permissions:
   rsb.pay:
     description: Bargeld versenden
   rsb.transfer:
-    description: Überweisung
+    description: Ueberweisung
+  rsb.transfers:
+    description: Liste Ueberweisungen

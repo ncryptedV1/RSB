@@ -59,6 +59,10 @@ public class AbstractCommand implements CommandExecutor {
         sendWarn("§cDu hast keine Berechtigung zu diesem Befehl");
     }
 
+    public void sendNotLoaded() {
+        sendWarn("§cDeine Daten werden noch geladen...\nBitte warte einen Moment");
+    }
+
     public void sendMsg(String msg) {
         sender.sendMessage(RSB.getPrefix() + msg);
     }

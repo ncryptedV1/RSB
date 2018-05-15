@@ -57,8 +57,7 @@ public class TransferCommand extends AbstractCommand {
                 }
                 getApi().getBalance(target, targetBalance -> {
                     try {
-                        getApi().removeBalance(player, source, money);
-                        getApi().setBalance(target, targetBalance + money);
+                        getApi().transfer(player, source, target, targetBalance, money);
                         sendMsg("§6Dir wurden §e" + money + "$§6 vom Konto §e" + Utils.toUserId(source) +
                                 "§6 abgezogen");
                         sendMsg("§6Du hast §e" + money + "$§6 auf das Konto §e" + Utils.toUserId(target) +
@@ -74,7 +73,7 @@ public class TransferCommand extends AbstractCommand {
                 });
             });
         } catch (PlayerNotCachedException e) {
-            sendWarn("§cDeine Daten werden noch geladen...\nBitte warte einen Moment");
+            sendNotLoaded();
         }
     }
 }

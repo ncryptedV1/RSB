@@ -42,7 +42,7 @@ public class AccountCommand extends AbstractCommand {
                     sendMsg("§6Konto: §e" + Utils.toUserId(id));
                     sendMsg("§6Kontostand: §e" + getApi().getBalance(player, id));
                 } catch (PlayerNotCachedException e) {
-                    sendWarn("§cDeine Daten werden noch geladen...\nBitte warte einen Moment");
+                    sendNotLoaded();
                 }
             }
         } else if (args.length == 2) {
@@ -67,7 +67,7 @@ public class AccountCommand extends AbstractCommand {
                     sendMsg("§6Das Konto mit der ID §e" + id + "§6 wurde gelöscht");
                     sendMsg("§6Dir wurden §e" + balance + "$§6 zum Bargeld hinzugefügt");
                 } catch (PlayerNotCachedException e) {
-                    sendWarn("§cDeine Daten werden noch geladen...\nBitte warte einen Moment");
+                    sendNotLoaded();
                 }
             }
         }

@@ -8,8 +8,10 @@ package de.ncrypted.rsb;
 import de.ncrypted.rsb.database.CacheController;
 import de.ncrypted.rsb.database.MySqlInterface;
 import de.ncrypted.rsb.utils.PlayerNotCachedException;
+import de.ncrypted.rsb.utils.Transaction;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -237,6 +239,102 @@ public class RSBApi {
             return;
         }
         mysql.getHolder(id, consumer);
+    }
+
+    // TRANSFERS
+
+    /**
+     * Adds transfer to database and cache if sender or target holder is online
+     * sender value 0 means deposit
+     * target value 0 means withdraw
+     * sender value -1 means interest
+     *
+     * @param transaction contains timestamp, sender, target and money
+     */
+    public void addTransfer(Transaction transaction) {
+        int sender = transaction.getSender();
+        int target = transaction.getTarget();
+        if (cache.getTransfers().containsKey(sender)) {
+            List<Transaction> transfers = cache.getTransfers().get(sender);
+            if (transfers.size() == 10) {
+                transfers.remove(transfers.size() - 1);
+            }
+            transfers.add(0, transaction);
+        }
+        if (cache.getTransfers().containsKey(target)) {
+            List<Transaction> transfers = cache.getTransfers().get(target);
+            if (transfers.size() == 10) {
+                transfers.remove(transfers.size() - 1);
+            }
+            transfers.add(0, transaction);
+        }
+        mysql.addTransfer(transaction);
+    }
+
+    /**
+     * Returns latest 10 transactions to or from an account
+     * Only works when account holder is online
+     *
+     * @param player account holder
+     * @param id     account
+     * @return transfers
+     * @throws PlayerNotCachedException
+     */
+    public List<Transaction> getTransfers(Player player, int id) throws PlayerNotCachedException {
+        if (!isPlayerLoaded(player)) {
+            throw new PlayerNotCachedException();
+        }
+        return cache.getTransfers().get(id);
+    }
+
+    /* ADAPTATIONS
+       Convenient for transfer logging
+     */
+
+    /**
+     * Requires balance of target account to act sync
+     * Source account holder must be online
+     *
+     * @param sourcePlayer  online player
+     * @param source        source account
+     * @param target        target account
+     * @param targetBalance target account balance
+     * @param money         money to transfer
+     * @throws PlayerNotCachedException
+     */
+    public void transfer(Player sourcePlayer, int source, int target, long targetBalance, long money) throws PlayerNotCachedException {
+        removeBalance(sourcePlayer, source, money);
+        setBalance(target, targetBalance + money);
+        addTransfer(new Transaction(source, target, money));
+    }
+
+    /**
+     * Puts cash into the account
+     * Only works for online player
+     *
+     * @param player account holder
+     * @param id     account
+     * @param money  cash
+     * @throws PlayerNotCachedException
+     */
+    public void deposit(Player player, int id, long money) throws PlayerNotCachedException {
+        removeCash(player, money);
+        addBalance(player, id, money);
+        addTransfer(new Transaction(0, id, money));
+    }
+
+    /**
+     * Puts money from an account into cash
+     *
+     * @param player account holder
+     * @param id     account
+     * @param money  balance to take
+     * @throws PlayerNotCachedException
+     */
+    public void withdraw(Player player, int id, long money) throws PlayerNotCachedException {
+        removeBalance(player, id, money);
+        addCash(player, money);
+        addTransfer(new Transaction(id, 0, money));
     }
 
     // UTILS

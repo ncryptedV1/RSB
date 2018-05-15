@@ -70,6 +70,7 @@ public class RSB extends JavaPlugin {
         getCommand("withdraw").setExecutor(new WithdrawCommand());
         getCommand("pay").setExecutor(new PayCommand());
         getCommand("transfer").setExecutor(new TransferCommand());
+        getCommand("transfers").setExecutor(new TransfersCommand());
         Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
     }
 

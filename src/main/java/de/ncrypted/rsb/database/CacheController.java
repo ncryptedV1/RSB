@@ -7,8 +7,10 @@ package de.ncrypted.rsb.database;
 
 import com.google.common.collect.Maps;
 import de.ncrypted.rsb.RSB;
+import de.ncrypted.rsb.utils.Transaction;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -23,6 +25,7 @@ public class CacheController {
     private Map<UUID, Set<Integer>> accounts = Maps.newConcurrentMap();
     private Map<Integer, UUID> accountToUuid = Maps.newConcurrentMap();
     private Map<Integer, Long> balances = Maps.newConcurrentMap();
+    private Map<Integer, List<Transaction>> transfers = Maps.newConcurrentMap();
     private RSB rsb;
     private MySqlInterface mysql;
 
@@ -47,6 +50,9 @@ public class CacheController {
                 mysql.getBalance(id, balance -> {
                     balances.put(id, balance);
                 });
+                mysql.getTransfers(id, transfer -> {
+                    transfers.put(id, transfer);
+                });
             }
         });
     }
@@ -57,6 +63,7 @@ public class CacheController {
             return;
         }
         for (Integer id : accounts.get(uuid)) {
+            transfers.remove(id);
             balances.remove(id);
             accountToUuid.remove(id);
         }
@@ -78,5 +85,9 @@ public class CacheController {
 
     public Map<Integer, Long> getBalances() {
         return balances;
+    }
+
+    public Map<Integer, List<Transaction>> getTransfers() {
+        return transfers;
     }
 }

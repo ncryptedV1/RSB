@@ -43,12 +43,11 @@ public class WithdrawCommand extends AbstractCommand {
                 sendWarn("§cAuf dem Konto §o" + Utils.toUserId(id) + "§c befinden sich nur §o" + balance + "$");
                 return;
             }
-            getApi().removeBalance(player, id, money);
-            getApi().addCash(player, money);
+            getApi().withdraw(player, id, money);
             sendMsg("§6Dir wurden §e" + money + "$§6 zum Bargeld hinzugefügt");
             sendMsg("§6Es wurden §e" + money + "$§6 vom Konto §e" + Utils.toUserId(id) + "§6 abgehoben");
         } catch (PlayerNotCachedException e) {
-            sendWarn("§cDeine Daten werden noch geladen...\nBitte warte einen Moment");
+            sendNotLoaded();
         }
     }
 }

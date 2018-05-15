@@ -46,7 +46,7 @@ public class PayCommand extends AbstractCommand {
             sendMsg("§6Dem Spieler §e" + target.getName() + "§6 wurden §e" + money + "$§6 geschickt");
             sendMsg(target, "§6Der Spieler §e" + player.getName() + "§6 hat dir §e" + money + "$§6 geschickt");
         } catch (PlayerNotCachedException e) {
-            sendWarn("§cDeine Daten werden noch geladen...\nBitte warte einen Moment");
+            sendNotLoaded();
         }
     }
 }

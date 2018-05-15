@@ -23,7 +23,7 @@ public class CashCommand extends AbstractCommand {
             long money = getApi().getCash(player);
             sendMsg("§6Bargeld: §e" + money + "$");
         } catch (PlayerNotCachedException e) {
-            sendWarn("§cDeine Daten werden noch geladen...\nBitte warte einen Moment");
+            sendNotLoaded();
         }
     }
 }

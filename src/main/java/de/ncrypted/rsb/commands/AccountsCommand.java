@@ -23,11 +23,10 @@ public class AccountsCommand extends AbstractCommand {
         sendMsg("§6Konten:");
         try {
             for (int id : getApi().getAccounts(player)) {
-                sendMsg("§8- §e" + Utils.toUserId(id));
+                sendMsg("§8- §e" + Utils.toUserId(id) + " §o" + getApi().getBalance(player, id) + "$");
             }
-            sendMsg("");
         } catch (PlayerNotCachedException e) {
-            sendWarn("§cDeine Daten werden noch geladen...\nBitte warte einen Moment");
+            sendNotLoaded();
         }
     }
 }

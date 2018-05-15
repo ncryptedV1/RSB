@@ -6,21 +6,24 @@
 package de.ncrypted.rsb.commands;
 
 import de.ncrypted.rsb.utils.PlayerNotCachedException;
+import de.ncrypted.rsb.utils.Transaction;
 import de.ncrypted.rsb.utils.Utils;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 /**
  * @author ncrypted
  */
-public class DepositCommand extends AbstractCommand {
+public class TransfersCommand extends AbstractCommand {
 
     @Override
     public void onPlayer(Player player, String[] args) {
-        if (!hasPerm("rsb.deposit")) {
+        if (!hasPerm("rsb.transfers")) {
             sendNoPerms();
             return;
         }
-        if (args.length != 2) {
+        if (args.length != 1) {
             return;
         }
         int id = Utils.parseId(args[0]);
@@ -28,24 +31,21 @@ public class DepositCommand extends AbstractCommand {
             sendWarn("§cDie eingegebene KontoID §o" + args[0] + "§c ist ungültig");
             return;
         }
-        long money = Utils.parseMoney(args[1]);
-        if (money == -1) {
-            sendWarn("§cDer eingegebene Betrag §o" + args[1] + "§c ist ungültig");
-            return;
-        }
         try {
             if (!getApi().isAccountHolder(player, id)) {
                 sendWarn("§cDu bist nicht der Besitzer des Kontos §o" + Utils.toUserId(id));
                 return;
             }
-            long cash = getApi().getCash(player);
-            if (money > cash) {
-                sendWarn("§cDu besitzt nur §o" + cash + "$§c Bargeld");
+            List<Transaction> transfers = getApi().getTransfers(player, id);
+            if (transfers.isEmpty()) {
+                sendWarn("§cEs existieren bisher noch keine Interaktionen mit dem Konto §4" + Utils.toUserId(id));
                 return;
             }
-            getApi().deposit(player, id, money);
-            sendMsg("§6Dir wurden §e" + money + "$§6 vom Bargeld abgezogen");
-            sendMsg("§6Es wurden §e" + money + "$§6 auf das Konto §e" + Utils.toUserId(id) + "§6 eingezahlt");
+            sendMsg("§6Transaktionen:");
+            sendMsg("§8- §eAktion Datum Zeit [Sender] [Empfänger] Betrag");
+            for (Transaction transfer : transfers) {
+                sendMsg("§8- §e" + transfer.getInfos());
+            }
         } catch (PlayerNotCachedException e) {
             sendNotLoaded();
         }
